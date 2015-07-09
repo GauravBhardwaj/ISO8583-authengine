@@ -7,12 +7,12 @@
 6. Sends the response to the client.
 
 
-#client
+#Client
 1. Sends transaction request.
 2. Waits for response
 
 
-#assumptions
+#Assumptions
 1. Request is coming from an already authorized client
 2. In this context we are Authorising against account number and transaction amount so we are using '0200' as MTI
 3. One sample request package is: '02005000000000000002191234567890123456789000000013990022' where account no is  1234567890123456789 and transaction amount = 139.90
@@ -30,3 +30,7 @@
 #Installation
 1. Clone the directory
 2. cd and Run python authdriver.py
+
+#Reference
+Used iso8583 open source library
+https://code.google.com/p/iso8583py/

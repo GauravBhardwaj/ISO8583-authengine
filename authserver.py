@@ -55,7 +55,6 @@ class authserver:
             conn, address = self.sock.accept()
             while True:
                 iso = conn.recv(2048)
-                #print "Recieved isooooooooooooo", iso
                 if iso:
                     pack = ISO8583()
                     #parse ISO
@@ -68,26 +67,6 @@ class authserver:
 
     				#comment out this part, for debugging
                     self.validate_transaction(records)
-                    """
-                    accno, amt, srid = None, None, None
-                    for v in v1:
-                        #print ('Bit %s of type %s with value = %s' % (v['bit'],v['type'],v['value']))
-                        if v['bit'] == '2' :
-                            accno = v['value']
-                        if v['bit'] == '4' :
-                            amt = v['value']
-                        if v['bit'] == '63' :
-                            srid = v['value']
-    					    #print ('Bit %s of type %s with value = %s' % (v['bit'],v['type'],v['value']))
-                    #print accno, amt, srid
-                    #accno = accno[2:]
-
-                    if self.accountdetails_dict[accno[2:]] >= int(amt)/100.0 :
-                        print "SerialId: ", srid[3:], " Account No.: ",accno[2:]," Available Balance: ",self.accountdetails_dict[accno[2:]]," Transaction Amount: ",str(int(amt)/100.0)," Status: ","Approved"
-                    else:
-                        print "SerialId: ", srid[3:], " Account No.: ",accno[2:]," Available Balance: ",self.accountdetails_dict[accno[2:]]," Transaction Amount: ",str(int(amt)/100.0)," Status: ","Rejected"
-
-                    """
 
 
 

@@ -17,6 +17,7 @@ TIME_BETWEEN_RECONNECTS = 2 #seconds
 IS_BIG_ENDIAN = True #
 MTI = '0200'
 FILE_NAME = 'MOCK_DATA.csv'
+NO_OF_TRANSACTIONS_TO_TEST_WITH = 150
 
 #populate account detials
 accountdetails_dict = util.populate_accountdb(FILE_NAME)
@@ -36,5 +37,5 @@ for account_no, amt in accountdetails_dict.items():
         iso = emu.create_message(MTI, account_no, random_transaction_amount, str(message))
         emu.send_message(iso)
         message += 1
-        if message == 200:
+        if message == NO_OF_TRANSACTIONS_TO_TEST_WITH:
             break

@@ -53,6 +53,5 @@ class emulator:
         '''
         '''
         message = iso.getNetworkISO()
-        #print "senders isooooooooooooo",message
         self.sock.send(message+"\n")
         #print ('Sending ... %s' % message)
