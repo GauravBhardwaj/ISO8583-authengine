@@ -48,11 +48,9 @@ class authserver:
         #create socket
         self.sock = socket(AF_INET, SOCK_STREAM)
         #bind it on a port
-        self.sock.bind(('', self.port))
+        self.sock.bind((self.serverip, self.port))
         #accept maximum two connections from client
-        self.sock.listen(2)
-
-
+        self.sock.listen(5)
         while True:
             conn, address = self.sock.accept()
             while True:
@@ -66,16 +64,14 @@ class authserver:
     					#print "Cool, thats the format we are accepting connections in "
                         print ("PLease send the message MTI as 0200 ")
 
+                    records = pack.getBitsAndValues()
 
-
-
-                    v1 = pack.getBitsAndValues()
     				#comment out this part, for debugging
+                    self.validate_transaction(records)
+                    """
                     accno, amt, srid = None, None, None
                     for v in v1:
                         #print ('Bit %s of type %s with value = %s' % (v['bit'],v['type'],v['value']))
-
-
                         if v['bit'] == '2' :
                             accno = v['value']
                         if v['bit'] == '4' :
@@ -84,8 +80,6 @@ class authserver:
                             srid = v['value']
     					    #print ('Bit %s of type %s with value = %s' % (v['bit'],v['type'],v['value']))
                     #print accno, amt, srid
-
-
                     #accno = accno[2:]
 
                     if self.accountdetails_dict[accno[2:]] >= int(amt)/100.0 :
@@ -93,84 +87,24 @@ class authserver:
                     else:
                         print "SerialId: ", srid[3:], " Account No.: ",accno[2:]," Available Balance: ",self.accountdetails_dict[accno[2:]]," Transaction Amount: ",str(int(amt)/100.0)," Status: ","Rejected"
 
+                    """
 
 
-            
 
-    def validate_transaction(self):
+    def validate_transaction(self, records):
         '''
         Approves or denies a transaction by checking against suffucient funds
         '''
-        pass
+        accno, amt, srid = None, None, None
+        for record in records:
+            if record['bit'] == '2' :
+                accno = record['value']
+            if record['bit'] == '4' :
+                amt = record['value']
+            if record['bit'] == '63' :
+                srid = record['value']
 
-
-
-
-'''
-# Configure the server
-serverIP = "127.0.0.1"
-serverPort = 8583
-maxConn = 5
-bigEndian = True
-#bigEndian = False
-
-
-# Create a TCP socket
-s = socket(AF_INET, SOCK_STREAM)
-# bind it to the server port
-s.bind((serverIP, serverPort))
-# Configure it to accept up to N simultaneous Clients waiting...
-s.listen(maxConn)
-
-
-# Run forever
-while 1:
-	#wait new Client Connection
-	connection, address = s.accept()
-	while 1:
-		# receive message
-		isoStr = connection.recv(2048)
-		if isoStr:
-			print ("\nInput ASCII |%s|" % isoStr)
-			pack = ISO8583()
-			#parse the iso
-			try:
-				if bigEndian:
-					pack.setNetworkISO(isoStr)
-				else:
-					pack.setNetworkISO(isoStr,False)
-
-				v1 = pack.getBitsAndValues()
-				for v in v1:
-					print ('Bit %s of type %s with value = %s' % (v['bit'],v['type'],v['value']))
-
-				if pack.getMTI() == '0200':
-					print ("\tThat's great !!! The client send a correct message !!!")
-				else:
-					print ("The client dosen't send the correct message!")
-					break
-
-
-			except InvalidIso8583, ii:
-				print ii
-				break
-			except:
-				print ('Something happened!!!!')
-				break
-            #send answer
-            pack.setMTI('0210')
-            pack.setBit(63,'This is sample response from server')
-            if bigEndian:
-                ans = pack.getNetworkISO()
-            else:
-                ans = pack.getNetworkISO(False)
-
-			print ('Sending answer %s' % ans)
-			connection.send(ans)
-
-		else:
-			break
-	# close socket
-	connection.close()
-	print ("Closed...")
-'''
+        if self.accountdetails_dict[accno[2:]] >= int(amt)/100.0 :
+            print "SerialId: ", srid[3:], " Account No.: ",accno[2:]," Available Balance: ",self.accountdetails_dict[accno[2:]]," Transaction Amount: ",str(int(amt)/100.0)," Status: ","Approved"
+        else:
+            print "SerialId: ", srid[3:], " Account No.: ",accno[2:]," Available Balance: ",self.accountdetails_dict[accno[2:]]," Transaction Amount: ",str(int(amt)/100.0)," Status: ","Rejected"
